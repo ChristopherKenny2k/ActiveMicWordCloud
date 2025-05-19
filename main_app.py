@@ -110,12 +110,12 @@ class RecorderApp:
 
     def generate_word_map(self):
         try:
-            # Create dated backup of original transcript
+            # saves original transcript as "transcriptdd-mm"
             today = datetime.today()
             dated_filename = f"transcript{today.strftime('%d-%m')}.txt"
             shutil.copy(self.transcript_file, dated_filename)
 
-            # Read and clean transcript
+            # read and clean transcript
             with open(self.transcript_file, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
             
@@ -125,30 +125,30 @@ class RecorderApp:
                 cleaned_line = self.remove_stopwords(line)
                 cleaned_text += cleaned_line + "\n"
 
-            # Save cleaned transcript
+            # save cleaned transcript as transcriptCleaned.txt
             cleaned_file = "transcriptCleaned.txt"
             with open(cleaned_file, 'w', encoding='utf-8') as f:
                 f.write(cleaned_text)
 
-            # Frequency count using cleaned file
+            # frequency count using cleaned file (free of stop words)
             words = []
             for line in cleaned_text.split('\n'):
                 words += [w.lower().strip(string.punctuation) for w in line.split() if w]
 
             counter = Counter(words)
-            # Filter out low-frequency words (e.g., < 4 occurrences)
+            # filter out low-frequency words (e.g., < 4 occurrences) Note*: change this parameter to your liking, 4 works well for a very filled word cloud
             filtered_counts = {w: c for w, c in counter.items() if c >= 4}
 
             if not filtered_counts:
                 messagebox.showinfo("No words", "Not enough words with frequency >= 4 to generate word map.")
                 return
 
-            # Save word counts to file (overwrite)
+            # save word counts to file (overwrite)
             with open("word_counts.txt", 'w', encoding='utf-8') as f:
                 for word, count in sorted(filtered_counts.items(), key=lambda x: x[1], reverse=True):
                     f.write(f"{word}: {count}\n")
 
-            # Create and save word cloud
+            # create and save word cloud
             wc = WordCloud(width=800, height=600, background_color='white')
             wc.generate_from_frequencies(filtered_counts)
             wc.to_file(self.wordcloud_file)
