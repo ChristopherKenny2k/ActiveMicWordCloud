@@ -49,13 +49,12 @@ class RecorderApp:
         self.generate_button.config(state=tk.DISABLED)
         self.timer_label.config(text="Listening for 0 seconds...")
 
-        # Clear transcript file
+        # transcript file gets cleared (maybe create option to continue transcript or start new)
         with open(self.transcript_file, 'w', encoding='utf-8') as f:
             f.write("")
 
-        # Start timer thread
+        # timer start
         threading.Thread(target=self.update_timer, daemon=True).start()
-        # Start recording thread
         threading.Thread(target=self.record_mic, daemon=True).start()
 
     def update_timer(self):
@@ -75,10 +74,9 @@ class RecorderApp:
                     with open(self.transcript_file, 'a', encoding='utf-8') as f:
                         f.write(text + "\n")
                 except sr.WaitTimeoutError:
-                    # No speech detected within timeout, just continue listening
                     continue
                 except sr.UnknownValueError:
-                    # Can't understand audio, skip
+                    # skip line if cant infer what was said, unfortunately a big limitation of this voice recog. module
                     continue
                 except Exception as e:
                     print("Error:", e)
@@ -101,7 +99,7 @@ class RecorderApp:
 
     def generate_word_map(self):
         try:
-            # Read transcript and remove stop words
+            # remove stop words
             with open(self.transcript_file, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
 
@@ -110,30 +108,30 @@ class RecorderApp:
                 cleaned_line = self.remove_stopwords(line)
                 cleaned_text += cleaned_line + "\n"
 
-            # Overwrite transcript with cleaned text
+            # save over with stop words removed
             with open(self.transcript_file, 'w', encoding='utf-8') as f:
                 f.write(cleaned_text)
 
-            # Count word frequencies
+            # frequency count
             words = []
             for line in cleaned_text.split('\n'):
                 words += [w.lower().strip(string.punctuation) for w in line.split() if w]
 
             counter = Counter(words)
-            # Filter words with count >=5
-            filtered_counts = {w: c for w, c in counter.items() if c >= 5}
+            # disregard words that feature less than 15 time --==THIS CAN BE CHANGED AS YOU WISH==--
+            filtered_counts = {w: c for w, c in counter.items() if c >= 15}
 
             if not filtered_counts:
                 messagebox.showinfo("No words", "Not enough words with frequency >= 5 to generate word map.")
                 return
 
-            # Generate word cloud
+            # create word cloud (default params)
             wc = WordCloud(width=800, height=600, background_color='white')
             wc.generate_from_frequencies(filtered_counts)
             wc.to_file(self.wordcloud_file)
 
             messagebox.showinfo("Done", f"Word bubble saved as {self.wordcloud_file}")
-            # Open image with default viewer
+            # opens word cloud
             webbrowser.open(f"file://{os.path.abspath(self.wordcloud_file)}")
 
         except Exception as e:

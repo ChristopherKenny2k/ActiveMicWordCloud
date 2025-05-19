@@ -18,13 +18,13 @@ def remove_stopwords_from_txt(file_path):
         words = line.strip().split()
         cleaned_words = []
         for word in words:
-            # Remove punctuation from the word for stop word matching
+            # strip punctuation
             word_stripped = word.strip(string.punctuation).lower()
             if word_stripped not in stop_words and word_stripped != '':
                 cleaned_words.append(word)
         cleaned_lines.append(' '.join(cleaned_words))
 
-    # Overwrite the original file with cleaned text
+    # overwrite text file with new (stripped) text, stop words removed
     with open(file_path, 'w', encoding='utf-8') as f:
         for line in cleaned_lines:
             if line.strip():
@@ -39,17 +39,17 @@ def count_words(file_path, output_path, min_count=10):
     with open(file_path, 'r', encoding='utf-8') as f:
         text = f.read()
 
-    # Tokenize words (split by whitespace), clean punctuation & lowercase
+    # tokenisation of words
     words = [word.strip(string.punctuation).lower() for word in text.split()]
-    words = [w for w in words if w]  # Remove empty strings
+    words = [w for w in words if w] 
 
-    # Count frequencies
+    # frequency count
     counter = Counter(words)
 
-    # Sort by frequency descending and filter by min_count
+    # sort desc
     sorted_words = [(word, count) for word, count in counter.most_common() if count >= min_count]
 
-    # Write output
+    # create output in format word, x (where x is count)
     with open(output_path, 'w', encoding='utf-8') as f:
         for word, count in sorted_words:
             f.write(f"{word}, {count}\n")
@@ -60,27 +60,22 @@ if __name__ == "__main__":
     count_words("transcription.txt", "word_counts.txt", min_count=5)
 
 def create_wordcloud_from_file(wordcounts_path, output_image_path):
-    # Read word counts file
+    # open the word count file
     word_freq = {}
     with open(wordcounts_path, 'r', encoding='utf-8') as f:
         for line in f:
             word, count = line.strip().split(', ')
             word_freq[word] = int(count)
 
-    # Create word cloud object
+    # creating the word cloud canvas
     wc = WordCloud(width=800, height=600, background_color='white')
 
-    # Generate word cloud from frequencies
+    # generate the cloud 
     wc.generate_from_frequencies(word_freq)
 
-    # Save to file
     wc.to_file(output_image_path)
     print(f"Word cloud saved to {output_image_path}")
 
-    # Optional: show the image inline (if running interactively)
-    # plt.imshow(wc, interpolation='bilinear')
-    # plt.axis('off')
-    # plt.show()
 
 if __name__ == "__main__":
     create_wordcloud_from_file("word_counts.txt", "word_bubble.png")
