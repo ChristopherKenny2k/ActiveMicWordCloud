@@ -13,16 +13,16 @@ with open(output_file, "a", encoding="utf-8") as f:
             recognizer.adjust_for_ambient_noise(source)
             while True:
                 try:
-                    # Adjust these as needed for responsiveness
+                    #params subject to changes
                     audio = recognizer.listen(source, timeout=1, phrase_time_limit=4)
                     text = recognizer.recognize_google(audio)
                     print(text)
                     f.write(text + "\n")
                     f.flush()
                 except sr.UnknownValueError:
-                    pass  # skip unrecognized speech
+                    pass  
                 except sr.WaitTimeoutError:
-                    pass  # skip if no speech detected quickly
+                    pass  
                 except sr.RequestError as e:
                     print(f"API request error: {e}")
     except KeyboardInterrupt:
