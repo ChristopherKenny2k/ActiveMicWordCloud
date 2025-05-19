@@ -29,7 +29,8 @@ Python 3.10+
 
 [Matplotlib (optional for inline preview)](https://matplotlib.org/)
 
-🚀 How It Works
+## **🚀 How It Works**
+
 Click "Start Recording"
 The app listens for speech input from your microphone.
 
