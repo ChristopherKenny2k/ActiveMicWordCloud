@@ -13,6 +13,7 @@ import webbrowser
 
 nltk.download('stopwords')
 
+#main app class
 class RecorderApp:
     def __init__(self, root):
         self.root = root
@@ -142,4 +143,4 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = RecorderApp(root)
     root.mainloop()
-    
+
