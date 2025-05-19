@@ -1,5 +1,5 @@
 # 🎤 Active Mic Word Cloud
-## Active Mic Word Cloud is a speech-driven Python application that actively listens to your microphone, transcribes spoken words in real-time, filters out stop words, and generates a beautiful word cloud image based on the most frequently spoken terms.
+## Active Mic Word Cloud is a speech-driven Python application that actively listens to your microphone, transcribes spoken words in real-time, filters out stop words, and generates a word cloud image based on the most frequently spoken terms.
 
 ## ✨ **Features**
 ### 🔊 **Live Microphone Recording** — Real-time speech recognition using your default microphone.
@@ -8,7 +8,7 @@
 
 ### 📊 **Word Frequency Analysis** — Sorts words by how often they were spoken.
 
-### ☁️ **Word Cloud Generation** — Creates a high-quality word cloud image from the final transcript.
+### ☁️ **Word Cloud Generation** — Creates a word cloud image from the final transcript.
 
 ### 🖱️ **Simple GUI** — User-friendly interface with Start, Stop, and Generate Word Cloud buttons.
 
