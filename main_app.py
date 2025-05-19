@@ -10,6 +10,10 @@ import string
 from wordcloud import WordCloud
 import os
 import webbrowser
+from datetime import datetime
+import shutil
+
+
 
 nltk.download('stopwords')
 
@@ -93,51 +97,67 @@ class RecorderApp:
         self.timer_label.config(text=f"Stopped recording at {self.elapsed_time} seconds")
 
     def remove_stopwords(self, text):
-        stop_words = set(stopwords.words('english'))
+        #NLTK Stopwords
+        NLTK_stop_words = set(stopwords.words('english'))
+
+        #CUSTOM STOP WORDS (good idea to check word cloud after first use to see what words you would like to omit in future uses)
+        self.custom_stopwords = set(["like", "oh", "get", "that's"])
+
+        all_stopwords = NLTK_stop_words.union(self.custom_stopwords)
         words = text.split()
-        filtered_words = [w for w in words if w.lower().strip(string.punctuation) not in stop_words]
+        filtered_words = [w for w in words if w.lower().strip(string.punctuation) not in all_stopwords]
         return ' '.join(filtered_words)
 
     def generate_word_map(self):
         try:
-            # remove stop words
+            # Create dated backup of original transcript
+            today = datetime.today()
+            dated_filename = f"transcript{today.strftime('%d-%m')}.txt"
+            shutil.copy(self.transcript_file, dated_filename)
+
+            # Read and clean transcript
             with open(self.transcript_file, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
+            
 
             cleaned_text = ""
             for line in lines:
                 cleaned_line = self.remove_stopwords(line)
                 cleaned_text += cleaned_line + "\n"
 
-            # save over with stop words removed
-            with open(self.transcript_file, 'w', encoding='utf-8') as f:
+            # Save cleaned transcript
+            cleaned_file = "transcriptCleaned.txt"
+            with open(cleaned_file, 'w', encoding='utf-8') as f:
                 f.write(cleaned_text)
 
-            # frequency count
+            # Frequency count using cleaned file
             words = []
             for line in cleaned_text.split('\n'):
                 words += [w.lower().strip(string.punctuation) for w in line.split() if w]
 
             counter = Counter(words)
-            # disregard words that feature less than 15 time --==THIS CAN BE CHANGED AS YOU WISH==--
-            filtered_counts = {w: c for w, c in counter.items() if c >= 15}
+            # Filter out low-frequency words (e.g., < 4 occurrences)
+            filtered_counts = {w: c for w, c in counter.items() if c >= 4}
 
             if not filtered_counts:
-                messagebox.showinfo("No words", "Not enough words with frequency >= 5 to generate word map.")
+                messagebox.showinfo("No words", "Not enough words with frequency >= 4 to generate word map.")
                 return
 
-            # create word cloud (default params)
+            # Save word counts to file (overwrite)
+            with open("word_counts.txt", 'w', encoding='utf-8') as f:
+                for word, count in sorted(filtered_counts.items(), key=lambda x: x[1], reverse=True):
+                    f.write(f"{word}: {count}\n")
+
+            # Create and save word cloud
             wc = WordCloud(width=800, height=600, background_color='white')
             wc.generate_from_frequencies(filtered_counts)
             wc.to_file(self.wordcloud_file)
 
             messagebox.showinfo("Done", f"Word bubble saved as {self.wordcloud_file}")
-            # opens word cloud
             webbrowser.open(f"file://{os.path.abspath(self.wordcloud_file)}")
 
         except Exception as e:
-            messagebox.showerror("Error", str(e))
-
+            messagebox.showerror("Error", f"Something went wrong: {str(e)}")
 
 if __name__ == "__main__":
     root = tk.Tk()
