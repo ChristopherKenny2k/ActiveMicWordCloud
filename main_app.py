@@ -28,6 +28,7 @@ class RecorderApp:
         self.transcript_file = "transcription.txt"
         self.wordcounts_file = "word_counts.txt"
         self.wordcloud_file = "word_bubble.png"
+        self.wordcloud_file = "WordCloud/word_bubble.png"
 
         # UI Elements
         self.timer_label = tk.Label(root, text="Not Recording")
@@ -110,10 +111,18 @@ class RecorderApp:
 
     def generate_word_map(self):
         try:
+
+            #If folders aren't present, create them
+            os.makedirs("Transcripts", exist_ok=True)  
+            os.makedirs("WordCloud", exist_ok=True) 
+
             # saves original transcript as "transcriptdd-mm"
             today = datetime.today()
-            dated_filename = f"transcript{today.strftime('%d-%m')}.txt"
-            shutil.copy(self.transcript_file, dated_filename)
+            dated_filename = today.strftime("%d-%m")
+            original_path = f"Transcripts/transcript_{dated_filename}.txt"
+            cleaned_path = f"Transcripts/transcriptCleaned_{dated_filename}.txt"
+            shutil.copy(self.transcript_file, original_path)
+
 
             # read and clean transcript
             with open(self.transcript_file, 'r', encoding='utf-8') as f:
