@@ -27,7 +27,7 @@ class RecorderApp:
         self.elapsed_time = 0
         self.transcript_file = "transcription.txt"
         self.wordcounts_file = "word_counts.txt"
-        self.wordcloud_file = "word_bubble.png"
+        self.wordcloud_file = "word_bubble21-5.png"
         self.wordcloud_file = "WordCloud/word_bubble.png"
 
         # UI Elements
