@@ -27,8 +27,7 @@ class RecorderApp:
         self.elapsed_time = 0
         self.transcript_file = "transcription.txt"
         self.wordcounts_file = "word_counts.txt"
-        self.wordcloud_file = "word_bubble21-5.png"
-        self.wordcloud_file = "WordCloud/word_bubble.png"
+        self.wordcloud_file = "word_bubble.png"
 
         # UI Elements
         self.timer_label = tk.Label(root, text="Not Recording")
@@ -114,11 +113,11 @@ class RecorderApp:
 
             #If folders aren't present, create them
             os.makedirs("Transcripts", exist_ok=True)  
-            os.makedirs("WordCloud", exist_ok=True) 
+            os.makedirs("WordClouds", exist_ok=True) 
 
             # saves original transcript as "transcriptdd-mm"
             today = datetime.today()
-            dated_filename = today.strftime("%d-%m")
+            dated_filename = today.strftime("%d_%m")
             original_path = f"Transcripts/transcript_{dated_filename}.txt"
             cleaned_path = f"Transcripts/transcriptCleaned_{dated_filename}.txt"
             shutil.copy(self.transcript_file, original_path)
@@ -157,13 +156,15 @@ class RecorderApp:
                 for word, count in sorted(filtered_counts.items(), key=lambda x: x[1], reverse=True):
                     f.write(f"{word}: {count}\n")
 
-            # create and save word cloud
-            wc = WordCloud(width=800, height=600, background_color='white')
+            # create and save word cloud with date
+            # change background colour as desired
+            wc = WordCloud(width=800, height=600, background_color='silver')
             wc.generate_from_frequencies(filtered_counts)
-            wc.to_file(self.wordcloud_file)
+            wordcloud_filename = f"WordClouds/WordCloud{today.strftime('%d_%m')}.png"
+            wc.to_file(wordcloud_filename)
 
-            messagebox.showinfo("Done", f"Word bubble saved as {self.wordcloud_file}")
-            webbrowser.open(f"file://{os.path.abspath(self.wordcloud_file)}")
+            messagebox.showinfo("Done", f"Word bubble saved as {wordcloud_filename}")
+            webbrowser.open(f"file://{os.path.abspath(wordcloud_filename)}")
 
         except Exception as e:
             messagebox.showerror("Error", f"Something went wrong: {str(e)}")
